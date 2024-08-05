@@ -24,12 +24,14 @@ t_block extend_heap(t_block last, size_t sz)
 {
     t_block b;
     b = sbrk(0);
-
-    if (sbrk(BLOCK_SIZE + sz) == (void*)-1) {
+    void *sb = sbrk(BLOCK_SIZE + sz);
+    if (sb == (void*)-1 || (long) sb < 0) {
         return (NULL);
     }
     b->size = sz;
     b->next = NULL;
+    b->prev = last;
+    b->ptr = b->data;
     if (last) {
         last->next = b;
     }
@@ -44,8 +46,12 @@ void split_block(t_block b, size_t s)
     new->size = b->size - s - BLOCK_SIZE;
     new->next = b->next;
     new->free = 1;
+    new->ptr = new->data;
     b->size = s;
     b->next = new;
+    if (new->next) {
+        new->next->prev = new;
+    }
 }
 
 void *malloc(size_t size) {
@@ -79,6 +85,5 @@ void *malloc(size_t size) {
         base = b;
     }
 
-    b->ptr = b->data;
     return (b->data);
 }

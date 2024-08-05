@@ -50,11 +50,6 @@ int main(void)
         return -1;
     }
 
-    if (!valid_address(arr)) {
-        write(STDOUT_FILENO, "F", 1);
-        return -1;
-    }
-
     size_t itr;
 
     for (itr = 0; itr < NUM_ELEMS; ++itr) {
@@ -71,26 +66,23 @@ int main(void)
         return -1;
     }
 
-    if (!valid_address(arr2)) {
-        write(STDOUT_FILENO, "F", 1);
-        free(arr);
-        return -1;
+    for (itr = 0; itr < NUM_ELEMS; ++itr) {
+        *(arr + itr) = ((int) itr) * 2;
     }
 
-    if ((arr2 = realloc(arr, NUM_ELEMS * sizeof(*arr2))) == NULL) {
-        free(arr);
-        return -1;
-    }
+    dump_long_arr(arr, NUM_ELEMS);
 
-    if (!valid_address(arr2)) {
-        write(STDOUT_FILENO, "F", 1);
+    if ((arr2 = realloc(arr, (NUM_ELEMS + 1) * sizeof(*arr2))) == NULL) {
         free(arr);
-        free(arr2);
         return -1;
     }
 
     dump_long_arr(arr, NUM_ELEMS);
-    dump_long_arr(arr2, NUM_ELEMS);
+    dump_long_arr(arr2, NUM_ELEMS + 1);
+
+    *(arr2 + NUM_ELEMS) = 1;
+    
+    dump_long_arr(arr2, NUM_ELEMS + 1);
 
     free(arr);
     free(arr2);
